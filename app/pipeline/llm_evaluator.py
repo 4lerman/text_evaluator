@@ -93,11 +93,11 @@ async def evaluate_with_llm(
         return []
 
     evaluator = get_evaluator(config.PROMETHEUS_MODEL)
-    results = await asyncio.gather(
-        *[_evaluate_chunk(chunk, evaluator, config) for chunk in chunks]
-    )
-    return sorted(
-        [v for v in results if v is not None],
-        key=lambda v: v.score,
-        reverse=True,
-    )
+    # Sequential — Ollama processes one inference at a time regardless of concurrency.
+    # Concurrent requests just queue and time out; sequential avoids that failure mode.
+    verdicts = []
+    for chunk in chunks:
+        result = await _evaluate_chunk(chunk, evaluator, config)
+        if result is not None:
+            verdicts.append(result)
+    return sorted(verdicts, key=lambda v: v.score, reverse=True)
