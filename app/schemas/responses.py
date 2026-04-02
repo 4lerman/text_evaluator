@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 class ScoredChunk(BaseModel):
@@ -15,7 +17,7 @@ class LLMVerdict(BaseModel):
     confirmed: bool
     reasoning: str
     score: int = 0               # ← new: 1–5 from Prometheus
-    evidence_quote: str | None = None
+    evidence_quote: Optional[str] = None
 
 class HighlightedToken(BaseModel):
     """A specific token highlighted within a confirmed sentence."""
@@ -45,5 +47,5 @@ class EvaluateResponse(BaseModel):
     """The final API response with all evaluations and a summary."""
     results: list[HighlightedSentence]
     summary: dict[str, int]
-    metrics: Metrics | None = None
+    metrics: Optional[Metrics] = None
     lang: str = "en"

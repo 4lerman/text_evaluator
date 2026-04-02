@@ -1,5 +1,7 @@
 import asyncio
 import logging
+from typing import Optional
+
 from prometheus_eval import PrometheusEval
 from prometheus_eval.litellm import LiteLLM
 
@@ -11,7 +13,20 @@ logger = logging.getLogger(__name__)
 
 # Global evaluator instance, initialized on first use or module load.
 # We use LiteLLM to interface with Prometheus (running via Ollama).
-_evaluator = None
+_evaluator: Optional[PrometheusEval] = None
+
+# Global semaphore: serializes all Prometheus/Ollama calls across concurrent
+# HTTP requests. Ollama queues internally but concurrent requests cause
+# timeouts; one-at-a-time is the correct model.
+_prometheus_sem: Optional[asyncio.Semaphore] = None
+
+
+def _get_semaphore(concurrency: int) -> asyncio.Semaphore:
+    """Return (creating once) the global Prometheus semaphore."""
+    global _prometheus_sem
+    if _prometheus_sem is None:
+        _prometheus_sem = asyncio.Semaphore(concurrency)
+    return _prometheus_sem
 
 
 def get_evaluator(model_name: str) -> PrometheusEval:
@@ -24,12 +39,16 @@ def get_evaluator(model_name: str) -> PrometheusEval:
     return _evaluator
 
 
+_MAX_RETRIES = 2
+_RETRY_BASE_DELAY = 2.0  # seconds; doubles each attempt
+
+
 async def _evaluate_chunk(
     chunk: ScoredChunk,
     evaluator: PrometheusEval,
     config: Settings,
-) -> LLMVerdict | None:
-    """Evaluate a single chunk with Prometheus. Returns None on failure or rejection.
+) -> Optional[LLMVerdict]:
+    """Evaluate a single chunk with Prometheus, retrying on transient failures.
 
     Args:
         chunk: The scored chunk to evaluate.
@@ -37,41 +56,75 @@ async def _evaluate_chunk(
         config: The application config.
 
     Returns:
-        LLMVerdict if confirmed, None otherwise.
+        LLMVerdict if confirmed, None if rejected or all retries exhausted.
     """
     value_def = next((v for v in DRIVE_VALUES if v.code == chunk.value_code), None)
     if not value_def:
         logger.warning("Value code %s not found in DRIVE_VALUES.", chunk.value_code)
         return None
 
-    try:
-        feedback, score = await asyncio.to_thread(
-            evaluator.single_absolute_grade,
-            instruction=value_def.instruction,
-            response=chunk.text,
-            rubric=value_def.rubric,
-            reference_answer=value_def.reference_answer,
-        )
-        if score >= config.CONFIRMATION_THRESHOLD:
-            logger.info(
-                "Confirmed match for %s (score: %d): %s...",
+    sem = _get_semaphore(config.PROMETHEUS_GLOBAL_CONCURRENCY)
+
+    for attempt in range(_MAX_RETRIES + 1):
+        try:
+            async with sem:
+                feedback, score = await asyncio.wait_for(
+                    asyncio.to_thread(
+                        evaluator.single_absolute_grade,
+                        instruction=value_def.instruction,
+                        response=chunk.text,
+                        rubric=value_def.rubric,
+                        reference_answer=value_def.reference_answer,
+                    ),
+                    timeout=config.PROMETHEUS_TIMEOUT_SECONDS,
+                )
+            if score >= config.CONFIRMATION_THRESHOLD:
+                logger.info(
+                    "Confirmed match for %s (score: %d): %s...",
+                    chunk.value_code, score, chunk.text[:50],
+                )
+                return LLMVerdict(
+                    text=chunk.text,
+                    value_code=chunk.value_code,
+                    value_name=chunk.value_name,
+                    confirmed=True,
+                    reasoning=feedback.strip(),
+                    score=score,
+                    evidence_quote=None,
+                )
+            logger.debug(
+                "Rejected match for %s (score: %d): %s...",
                 chunk.value_code, score, chunk.text[:50],
             )
-            return LLMVerdict(
-                text=chunk.text,
-                value_code=chunk.value_code,
-                value_name=chunk.value_name,
-                confirmed=True,
-                reasoning=feedback.strip(),
-                score=score,
-                evidence_quote=None,
-            )
-        logger.debug(
-            "Rejected match for %s (score: %d): %s...",
-            chunk.value_code, score, chunk.text[:50],
-        )
-    except Exception as exc:
-        logger.error("Error during Prometheus evaluation for chunk: %s", exc)
+            return None  # deliberate rejection — no retry needed
+
+        except asyncio.TimeoutError:
+            exc_msg = f"timed out after {config.PROMETHEUS_TIMEOUT_SECONDS}s"
+            if attempt < _MAX_RETRIES:
+                delay = _RETRY_BASE_DELAY * (2 ** attempt)
+                logger.warning(
+                    "Prometheus call %s (attempt %d/%d), retrying in %.0fs",
+                    exc_msg, attempt + 1, _MAX_RETRIES + 1, delay,
+                )
+                await asyncio.sleep(delay)
+            else:
+                logger.error(
+                    "Prometheus call %s after %d attempts for chunk [%s]",
+                    exc_msg, _MAX_RETRIES + 1, chunk.value_code,
+                )
+        except Exception as exc:
+            if attempt < _MAX_RETRIES:
+                delay = _RETRY_BASE_DELAY * (2 ** attempt)
+                logger.warning(
+                    "Prometheus call failed (attempt %d/%d), retrying in %.0fs: %s",
+                    attempt + 1, _MAX_RETRIES + 1, delay, exc,
+                )
+                await asyncio.sleep(delay)
+            else:
+                logger.error(
+                    "Prometheus call failed after %d attempts for chunk [%s]: %s",
+                    _MAX_RETRIES + 1, chunk.value_code, exc,
+                )
 
     return None
 
@@ -100,4 +153,12 @@ async def evaluate_with_llm(
         result = await _evaluate_chunk(chunk, evaluator, config)
         if result is not None:
             verdicts.append(result)
+
+    if not verdicts:
+        logger.warning(
+            "Stage 3: all %d chunk(s) were rejected or failed. "
+            "Check Ollama is running and CONFIRMATION_THRESHOLD (%d) is not too high.",
+            len(chunks), config.CONFIRMATION_THRESHOLD,
+        )
+
     return sorted(verdicts, key=lambda v: v.score, reverse=True)

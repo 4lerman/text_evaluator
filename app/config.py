@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     """Application configuration from environment variables."""
-    LLM_API_KEY: str
+    LLM_API_KEY: str = ""   # optional when using Ollama/Prometheus locally
     LLM_API_URL: str = "https://api.openai.com/v1/chat/completions"
     LLM_MODEL: str = "gpt-4o-mini"
     EMBEDDING_MODEL_NAME: str = "intfloat/multilingual-e5-large-instruct"
@@ -15,6 +15,13 @@ class Settings(BaseSettings):
 
     PROMETHEUS_MODEL: str = "ollama/vicgalle/prometheus-7b-v2.0"
     CONFIRMATION_THRESHOLD: int = 3   # score >= this → confirmed
+
+    # Timeout / concurrency knobs (all tunable via .env)
+    EVALUATE_TIMEOUT_SECONDS: int = 300      # total request budget
+    EMBEDDING_TIMEOUT_SECONDS: int = 60      # Stage 2
+    PROMETHEUS_TIMEOUT_SECONDS: int = 120    # per-chunk Ollama call
+    HIGHLIGHT_TIMEOUT_SECONDS: int = 30      # Stage 4
+    PROMETHEUS_GLOBAL_CONCURRENCY: int = 1   # Ollama is serial; keep at 1
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

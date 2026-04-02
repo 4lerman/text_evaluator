@@ -6,7 +6,7 @@ from collections import defaultdict
 from langdetect import detect, LangDetectException
 
 from app.config import config
-from app.schemas.responses import EvaluateResponse, Metrics
+from app.schemas.responses import EvaluateResponse, HighlightedSentence, Metrics
 from app.pipeline.chunker import chunk_text
 from app.pipeline.embedder import filter_by_similarity
 from app.pipeline.llm_evaluator import evaluate_with_llm
@@ -88,13 +88,16 @@ async def run_funnel(text: str, app_state) -> EvaluateResponse:
         return EvaluateResponse(results=[], summary={}, lang=lang)
 
     # Stage 2: Semantic Filtering with language-routed descriptions + z-score
-    scored_chunks = await filter_by_similarity(
-        sentences,
-        app_state.embedding_model,
-        lang=lang,
-        raw_floor=config.SIMILARITY_THRESHOLD,
-        z_threshold=config.Z_SCORE_THRESHOLD,
-        competitor_margin=config.COMPETITOR_MARGIN,
+    scored_chunks = await asyncio.wait_for(
+        filter_by_similarity(
+            sentences,
+            app_state.embedding_model,
+            lang=lang,
+            raw_floor=config.SIMILARITY_THRESHOLD,
+            z_threshold=config.Z_SCORE_THRESHOLD,
+            competitor_margin=config.COMPETITOR_MARGIN,
+        ),
+        timeout=config.EMBEDDING_TIMEOUT_SECONDS,
     )
     if not scored_chunks:
         return EvaluateResponse(results=[], summary={}, lang=lang)
@@ -104,12 +107,32 @@ async def run_funnel(text: str, app_state) -> EvaluateResponse:
     if not verdicts:
         return EvaluateResponse(results=[], summary={}, lang=lang)
 
-    # Stage 4: POS Highlighting — route to Russian model for Cyrillic input
+    # Stage 4: POS Highlighting — route to Russian model for Cyrillic input.
+    # All sentences are highlighted in a single background thread to avoid
+    # concurrent spaCy access across many threads under load.
     pos_nlp = app_state.ru_pos_nlp if lang in CYRILLIC_LANGS else app_state.pos_nlp
 
-    highlighted_sentences = list(await asyncio.gather(
-        *[asyncio.to_thread(highlight_sentence, v.text, v, pos_nlp) for v in verdicts]
-    ))
+    def _highlight_all() -> list:
+        return [highlight_sentence(v.text, v, pos_nlp) for v in verdicts]
+
+    try:
+        highlighted_sentences = await asyncio.wait_for(
+            asyncio.to_thread(_highlight_all),
+            timeout=config.HIGHLIGHT_TIMEOUT_SECONDS,
+        )
+    except asyncio.TimeoutError:
+        logger.warning("Stage 4 highlighting timed out; returning results without highlights")
+        highlighted_sentences = [
+            HighlightedSentence(
+                text=v.text,
+                value_code=v.value_code,
+                value_name=v.value_name,
+                reasoning=v.reasoning,
+                score=v.score,
+                highlights=[],
+            )
+            for v in verdicts
+        ]
     summary_counts: dict[str, int] = defaultdict(int)
     for verdict in verdicts:
         summary_counts[verdict.value_code] += 1
