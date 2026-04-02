@@ -1,0 +1,29 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - LLM_API_KEY=sk-dummy-key  # placeholder as LLM_API_KEY is required by config but we use Ollama
+      - OLLAMA_API_BASE=http://ollama:11434
+      - LLM_MODEL=gpt-4o-mini # still used as a fallback or if not using Prometheus? actually prometheus is used
+    depends_on:
+      - ollama
+    networks:
+      - drive-network
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    networks:
+      - drive-network
+
+networks:
+  drive-network:
+    driver: bridge
+
+volumes:
+  ollama-models:

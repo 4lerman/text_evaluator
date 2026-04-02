@@ -1,0 +1,293 @@
+{
+  "description": "Sample texts for testing the D.R.I.V.E. Evaluator API. Each example is a realistic interview or essay answer. Texts are provided in English, Russian, and Kazakh. 'difficulty' indicates how hard it is for the model to correctly evaluate. 'expected_confirms' gives min/max bounds on confirmed sentences for automated eval. 'category' is 'positive' (should confirm ≥1), 'negative' (should confirm 0), or 'ambiguous' (tests precision — see notes).",
+  "examples": [
+
+    {
+      "id": "D-en-1",
+      "category": "positive",
+      "primary_value": "D",
+      "language": "en",
+      "difficulty": "easy",
+      "expected_confirms": {"min": 1, "max": 4},
+      "label": "Disciplined Resilience — handling burnout",
+      "text": "During the final quarter of our product launch, the team was stretched to breaking point. I personally worked through two consecutive weeks with very little sleep, but I made sure to build in small recovery rituals: a 20-minute walk every morning and a strict no-screens rule after 10 PM. Those habits kept me functional and emotionally stable when everyone else was fraying. When a critical integration failed two days before the demo, I stayed calm, broke the problem into manageable tasks, and we shipped on time."
+    },
+    {
+      "id": "D-ru-1",
+      "category": "positive",
+      "primary_value": "D",
+      "language": "ru",
+      "difficulty": "easy",
+      "expected_confirms": {"min": 1, "max": 4},
+      "label": "Дисциплинированная стойкость — работа под давлением",
+      "text": "На последнем этапе запуска продукта команда работала на пределе возможностей. Я лично вёл работу почти без выходных, однако каждый день уделял тридцать минут физическим упражнениям и старался ложиться спать в одно и то же время. Именно эти привычки помогли мне сохранять эмоциональное равновесие в критические моменты. Когда за двое суток до демонстрации сломалась ключевая интеграция, я не паниковал: разбил задачу на части, распределил их между коллегами и мы успешно уложились в срок."
+    },
+    {
+      "id": "D-kz-1",
+      "category": "positive",
+      "primary_value": "D",
+      "language": "kz",
+      "difficulty": "easy",
+      "expected_confirms": {"min": 1, "max": 4},
+      "label": "Тәртіпті төзімділік — қысым астындағы жұмыс",
+      "text": "Өнімді іске қосудың соңғы кезеңінде команда шығындану шегіне жетті. Мен өзім демалыссыз жұмыс істедім, бірақ күнде жиырма минут серуендеп, ұйқы кестесін сақтауға тырыстым. Осы қарапайым әдеттер маған эмоционалды тепе-теңдікті сақтауға мүмкіндік берді. Демонстрацияға екі күн қалғанда маңызды интеграция бұзылды. Мен сабырлылықпен мәселені бөліктерге бөліп, командаға тапсырдым және біз мерзімінде жеткіздік."
+    },
+
+    {
+      "id": "R-en-1",
+      "category": "positive",
+      "primary_value": "R",
+      "language": "en",
+      "difficulty": "easy",
+      "expected_confirms": {"min": 1, "max": 4},
+      "label": "Responsible Innovation — data-driven A/B testing",
+      "text": "Our onboarding completion rate was at 42%. Rather than guessing what was wrong, I proposed a proper A/B test: we defined a hypothesis that simplifying the third step would increase completion by at least 10%, set a two-week observation window, and used a chi-squared test to confirm statistical significance before rolling out. The result was a 17% lift. Crucially, we also checked that the change didn't inadvertently disadvantage users with accessibility needs before shipping to 100%."
+    },
+    {
+      "id": "R-ru-1",
+      "category": "positive",
+      "primary_value": "R",
+      "language": "ru",
+      "difficulty": "easy",
+      "expected_confirms": {"min": 1, "max": 4},
+      "label": "Ответственные инновации — принятие решений на основе данных",
+      "text": "Показатель завершения онбординга составлял 42%. Вместо того чтобы действовать наугад, я предложил провести A/B-тест: сформулировал гипотезу, что упрощение третьего шага повысит конверсию не менее чем на 10%, установил двухнедельное окно наблюдения и применил критерий хи-квадрат для подтверждения статистической значимости. В итоге мы получили рост на 17%. Кроме того, перед финальным запуском я специально проверил, что изменение не ухудшает опыт пользователей с ограниченными возможностями."
+    },
+    {
+      "id": "R-kz-1",
+      "category": "positive",
+      "primary_value": "R",
+      "language": "kz",
+      "difficulty": "easy",
+      "expected_confirms": {"min": 1, "max": 4},
+      "label": "Жауапты инновация — деректерге негізделген шешім",
+      "text": "Онбордингті аяқтау көрсеткіші 42% болды. Болжаммен жұмыс жасаудың орнына мен A/B тестін ұсындым: үшінші қадамды жеңілдету конверсияны кемінде 10%-ға арттырады деген гипотеза қойдым, екі аптаның ішінде байқау жүргіздім және хи-квадрат критерийімен статистикалық маңыздылықты растадым. Нәтижесінде 17% өсім алдық. Сонымен қатар, толық іске қосу алдында өзгерістің мүмкіндігі шектеулі пайдаланушыларға кері әсер етпейтінін тексерді."
+    },
+
+    {
+      "id": "I-en-1",
+      "category": "positive",
+      "primary_value": "I",
+      "language": "en",
+      "difficulty": "medium",
+      "expected_confirms": {"min": 1, "max": 3},
+      "label": "Insightful Vision — systems thinking",
+      "text": "When our customer churn spiked in Q3, everyone assumed it was a pricing issue. I stepped back and mapped the full customer journey across acquisition, activation, and retention. The data revealed that the real bottleneck was a 72-hour delay between sign-up and first meaningful value delivered. Fixing pricing would have changed nothing. Instead, we restructured our activation flow, and churn dropped by 23% over the next two quarters — without touching the pricing model at all."
+    },
+    {
+      "id": "I-ru-1",
+      "category": "positive",
+      "primary_value": "I",
+      "language": "ru",
+      "difficulty": "medium",
+      "expected_confirms": {"min": 1, "max": 3},
+      "label": "Проницательное видение — системное мышление",
+      "text": "Когда в третьем квартале резко вырос отток клиентов, все решили, что дело в ценообразовании. Я остановился и составил карту всего клиентского пути — от привлечения до удержания. Данные показали, что настоящим узким местом является 72-часовая задержка между регистрацией и первым ощутимым результатом для пользователя. Изменение цен ничего бы не дало. Вместо этого мы перестроили онбординг, и за следующие два квартала отток сократился на 23% — при неизменной модели ценообразования."
+    },
+    {
+      "id": "I-kz-1",
+      "category": "positive",
+      "primary_value": "I",
+      "language": "kz",
+      "difficulty": "medium",
+      "expected_confirms": {"min": 1, "max": 3},
+      "label": "Болжамды көзқарас — жүйелі ойлау",
+      "text": "Үшінші тоқсанда клиенттер кетуі күрт өскенде, барлығы баға мәселесі деп ойлады. Мен тоқтап, тартудан бастап ұстап қалуға дейінгі клиент жолын толық картаға түсірдім. Деректер нақты кедергі — тіркелу мен пайдаланушыға бірінші нақты нәтижені жеткізу арасындағы 72 сағаттық кідіріс екенін көрсетті. Бағаны өзгерту ештеңе өзгертпес еді. Оның орнына біз онбордингті қайта құрдық және келесі екі тоқсанда кету деңгейі 23%-ға төмендеді."
+    },
+
+    {
+      "id": "V-en-1",
+      "category": "positive",
+      "primary_value": "V",
+      "language": "en",
+      "difficulty": "medium",
+      "expected_confirms": {"min": 1, "max": 3},
+      "label": "Values-Driven Leadership — inclusion and service",
+      "text": "When I took over as team lead, I noticed that two junior colleagues from non-native speaking backgrounds rarely spoke up in meetings. I restructured our sprint retrospectives so that everyone submitted thoughts in writing first, before any verbal discussion. Within a month, the quality of ideas from those two colleagues transformed our roadmap. One of their suggestions led to a feature that became our most-used function by Q4. Leadership, to me, means creating conditions where everyone's voice has equal weight."
+    },
+    {
+      "id": "V-ru-1",
+      "category": "positive",
+      "primary_value": "V",
+      "language": "ru",
+      "difficulty": "medium",
+      "expected_confirms": {"min": 1, "max": 3},
+      "label": "Ценностно-ориентированное лидерство — включённость и служение",
+      "text": "Когда я стал руководителем команды, заметил, что два младших коллеги с неродным языком почти не высказывались на встречах. Я изменил формат ретроспектив: теперь каждый сначала записывал свои мысли, и только потом начиналось обсуждение вслух. Уже через месяц идеи этих коллег начали менять наш роадмап. Одно из их предложений привело к созданию функции, которая к четвёртому кварталу стала самой используемой. Для меня лидерство — это создание условий, в которых голос каждого имеет одинаковый вес."
+    },
+    {
+      "id": "V-kz-1",
+      "category": "positive",
+      "primary_value": "V",
+      "language": "kz",
+      "difficulty": "medium",
+      "expected_confirms": {"min": 1, "max": 3},
+      "label": "Құндылыққа негізделген көшбасшылық — инклюзивтілік",
+      "text": "Жетекші болған кезде, ана тілі басқа екі кіші әріптесімнің жиналыстарда сирек сөйлейтінін байқадым. Мен ретроспектива форматын өзгерттім: алдымен әркім өз ойын жазбаша жазды, содан кейін ғана ауызша талқылау басталды. Бір айдан кейін осы әріптестерімнің идеялары жол картамызды өзгерте бастады. Олардың бір ұсынысы төртінші тоқсанда ең көп қолданылатын функцияға айналды. Менің үшін көшбасшылық — әр адамның дауысы тең салмаққа ие болатын жағдай жасау."
+    },
+
+    {
+      "id": "E-en-1",
+      "category": "positive",
+      "primary_value": "E",
+      "language": "en",
+      "difficulty": "easy",
+      "expected_confirms": {"min": 1, "max": 4},
+      "label": "Entrepreneurial Execution — building partnerships",
+      "text": "I identified that our go-to-market strategy was missing a key distribution channel: HR tech platforms. I cold-outreached fifteen vendors, crafted a compelling partnership narrative showing mutual revenue upside, and negotiated a co-marketing agreement with two of them within six weeks. This opened access to 40,000 potential users at zero acquisition cost. I then built the business case for our CEO showing a projected 3x ROI over 18 months, which secured budget for two additional partnership hires."
+    },
+    {
+      "id": "E-ru-1",
+      "category": "positive",
+      "primary_value": "E",
+      "language": "ru",
+      "difficulty": "easy",
+      "expected_confirms": {"min": 1, "max": 4},
+      "label": "Предпринимательское исполнение — партнёрства и возможности",
+      "text": "Я понял, что в нашей стратегии выхода на рынок отсутствует важный канал распространения — HR-tech платформы. Я самостоятельно обратился к пятнадцати потенциальным партнёрам, подготовил убедительный нарратив о взаимной выгоде и за шесть недель заключил соглашения о со-маркетинге с двумя из них. Это открыло доступ к 40 000 потенциальных пользователей без затрат на привлечение. Затем я подготовил бизнес-кейс для CEO с прогнозируемым ROI 3x за 18 месяцев, что позволило получить бюджет на двух новых сотрудников по партнёрствам."
+    },
+    {
+      "id": "E-kz-1",
+      "category": "positive",
+      "primary_value": "E",
+      "language": "kz",
+      "difficulty": "easy",
+      "expected_confirms": {"min": 1, "max": 4},
+      "label": "Кәсіпкерлік орындалым — серіктестіктер орнату",
+      "text": "Нарыққа шығу стратегиясымызда маңызды тарату арнасының — HR-tech платформаларының — жетіспейтінін байқадым. Мен он бес потенциалды серіктеске өзім хабарластым, өзара пайда туралы сенімді нарратив дайындадым және алты аптада екеуімен ко-маркетинг келісімін жасадым. Бұл нөлдік тарту шығынымен 40 000 потенциалды пайдаланушыға жол ашты. Содан кейін CEO үшін 18 айда 3x ROI болжамын көрсететін бизнес-кейс дайындадым және екі жаңа серіктестік менеджерін жалдауға бюджет алдым."
+    },
+
+    {
+      "id": "MULTI-en-1",
+      "category": "positive",
+      "primary_value": "multiple",
+      "language": "en",
+      "difficulty": "hard",
+      "expected_confirms": {"min": 2, "max": 6},
+      "label": "Multi-value — D + R + E combined (strong answer)",
+      "text": "Last year I launched an internal innovation program from scratch. Despite initial resistance from senior management, I consistently pushed through the bureaucracy, maintaining composure in every steering committee meeting. I ran a structured experiment: piloted the program with three teams, measured output quality and morale before and after, and used the results to build a data-driven case for full rollout. I also sourced external mentors and negotiated pro-bono partnerships with two local universities, expanding our capacity at zero additional cost. The program ultimately produced four patent filings and reduced voluntary attrition by 18%."
+    },
+    {
+      "id": "MULTI-ru-1",
+      "category": "positive",
+      "primary_value": "multiple",
+      "language": "ru",
+      "difficulty": "hard",
+      "expected_confirms": {"min": 2, "max": 6},
+      "label": "Несколько ценностей — D + I + V",
+      "text": "В прошлом году я инициировал внутреннюю программу инноваций с нуля. Несмотря на первоначальное сопротивление руководства, я сохранял спокойствие на каждом совещании и методично двигался вперёд. Я провёл пилот с тремя командами, измерил качество результатов и уровень вовлечённости до и после, а затем использовал эти данные для аргументации полного запуска. Параллельно я изменил формат наших ретроспектив, чтобы все участники — включая самых тихих — имели равный голос. Программа привела к четырём патентным заявкам и снизила добровольную текучесть на 18%."
+    },
+    {
+      "id": "MULTI-kz-1",
+      "category": "positive",
+      "primary_value": "multiple",
+      "language": "kz",
+      "difficulty": "hard",
+      "expected_confirms": {"min": 2, "max": 6},
+      "label": "Бірнеше құндылық — R + V + E",
+      "text": "Өткен жылы мен нөлден ішкі инновация бағдарламасын іске қостым. Басшылықтың бастапқы қарсылығына қарамастан мен сабырлылықты сақтап, алға жылжудан тоқтамадым. Үш команданы пилоттық режимде тест жасадым, нәтижелер мен моральды алдын ала және кейін өлшедім, деректерге негізделген аргументпен толық іске қосуды ұйымдастырдым. Сонымен қатар екі жергілікті университетпен ақысыз менторлық серіктестік орнаттым. Бағдарлама нәтижесінде төрт патент өтінімі берілді және ерікті кадр тұрақсыздығы 18%-ға азайды."
+    },
+
+    {
+      "id": "NEG-en-1",
+      "category": "negative",
+      "primary_value": "none",
+      "language": "en",
+      "difficulty": "medium",
+      "expected_confirms": {"min": 0, "max": 0},
+      "label": "Negative — blame narrative disguised as resilience",
+      "notes": "Uses first-person 'kept showing up' framing that superficially resembles D, but the underlying pattern is external attribution, zero self-regulation insight, and no recovery habits. Should not confirm D.",
+      "text": "The project deadline was completely unrealistic from the start, and no amount of effort was going to change that. I raised concerns in every meeting but was ignored by leadership. When things finally fell apart, the blame landed on the team rather than on the management decisions that created the impossible situation. I stayed professional throughout — I kept showing up, I kept delivering what I could — but I'll be honest: it was demoralizing, and I'm not sure what I could have done differently given the circumstances."
+    },
+    {
+      "id": "NEG-en-2",
+      "category": "negative",
+      "primary_value": "none",
+      "language": "en",
+      "difficulty": "hard",
+      "expected_confirms": {"min": 0, "max": 0},
+      "label": "Negative — buzzword soup, hollow corporate speak",
+      "notes": "Deliberately uses D.R.I.V.E. vocabulary (emotional intelligence, innovative, authentic leadership, execution, resilience) but demonstrates no concrete action, outcome, or specific behavior. A well-calibrated LLM should reject all sentences as substance-free.",
+      "text": "I'm deeply committed to leveraging my unique combination of strategic agility and emotional intelligence to drive value-accretive outcomes across all stakeholder dimensions. I consistently operationalize innovative frameworks and champion cross-functional synergies to unlock transformative potential. My passion for purpose-driven execution and authentic leadership ensures I maintain high-impact contributions in fast-paced, ambiguous environments, and my resilience in the face of adversity has been a cornerstone of every team I have served."
+    },
+    {
+      "id": "NEG-en-3",
+      "category": "negative",
+      "primary_value": "none",
+      "language": "en",
+      "difficulty": "medium",
+      "expected_confirms": {"min": 0, "max": 0},
+      "label": "Negative — credit hoarding, team diminishment",
+      "notes": "Explicitly attributes success to solo effort, frames delegation as a liability, and reduces colleagues to a passive role. Directly contradicts V (inclusion, dignity, collaboration). Does not demonstrate D, R, I, or E either — outcome is cited but the reasoning is anti-collaborative.",
+      "text": "The turnaround was successful largely because I personally rewrote most of the deliverables that came back below standard. I've learned that delegation has real limits, and in high-stakes moments it's simply faster and better to do things yourself. My teammates are capable at routine work, but when precision matters I prefer to maintain direct control and review everything myself. We hit our targets, which is what matters in the end."
+    },
+    {
+      "id": "NEG-ru-1",
+      "category": "negative",
+      "primary_value": "none",
+      "language": "ru",
+      "difficulty": "easy",
+      "expected_confirms": {"min": 0, "max": 0},
+      "label": "Негатив — жалоба на обстоятельства, пассивная позиция",
+      "notes": "Pure external attribution and helplessness framing. No agency, no coping strategy, no growth insight. Should score 0 confirms across all values.",
+      "text": "На последнем проекте всё шло не так с самого начала. Требования постоянно менялись, сроки были нереальными, а поддержки от руководства практически не было. Я делал всё возможное, но в подобных условиях сложно что-то контролировать. Думаю, любой оказался бы в такой ситуации на моём месте, и я не уверен, что можно было сделать иначе."
+    },
+    {
+      "id": "NEG-kz-1",
+      "category": "negative",
+      "primary_value": "none",
+      "language": "kz",
+      "difficulty": "easy",
+      "expected_confirms": {"min": 0, "max": 0},
+      "label": "Теріс — жағдайларға шағым, енжар ұстаным",
+      "notes": "Kazakh equivalent of NEG-ru-1. Pure external attribution with no agency or growth framing. Should score 0 confirms.",
+      "text": "Жоба басынан соңына дейін қиын болды. Талаптар үнемі өзгеріп тұрды, мерзімдер мүмкін емес еді, ал басшылықтан қолдау болмады. Мен мүмкіндігімше тырыстым, бірақ мұндай жағдайда нәтиже шығару мүмкін емес. Менің орнымда кез келген адам осылай болар еді, және мен не басқаша жасай алатынымды білмеймін."
+    },
+
+    {
+      "id": "AMB-en-1",
+      "category": "ambiguous",
+      "primary_value": "D",
+      "language": "en",
+      "difficulty": "hard",
+      "expected_confirms": {"min": 0, "max": 0},
+      "label": "Ambiguous — survival framing misread as Disciplined Resilience",
+      "notes": "Superficially resembles D (got through a difficult period, kept showing up) but explicitly lacks self-regulation, healthy habits, determination, and growth framing. Candidate describes inertia and passivity, not discipline. The final sentence ('I was just surviving') is a direct red flag. A precise model should reject D.",
+      "text": "I genuinely don't know how I got through that year. The stress was relentless and the environment was toxic — my manager was unpredictable and the team was falling apart around me. I kept showing up every day, I suppose out of stubbornness or maybe just inertia. I didn't really have any coping strategies — I just pushed through and waited for it to be over. Looking back, I'm not proud of how I handled it emotionally; I was just surviving, not thriving."
+    },
+    {
+      "id": "AMB-en-2",
+      "category": "ambiguous",
+      "primary_value": "R",
+      "language": "en",
+      "difficulty": "hard",
+      "expected_confirms": {"min": 0, "max": 0},
+      "label": "Ambiguous — luck reframed as Responsible Innovation",
+      "notes": "Uses data and outcome language (churn numbers, 12% drop, cohort observation) that superficially resembles R or I, but there is no hypothesis, no controlled test, no statistical validation, and the candidate explicitly attributes the result to timing and intuition. The phrase 'the timing worked out well' is a tell. Should not confirm R or I.",
+      "text": "I noticed that our churn numbers were unusually high in one particular cohort and mentioned it to the head of product over coffee. She suggested we try a different onboarding sequence for that group. We made the change and the numbers improved — churn dropped 12% over the next month. It was a good catch and I'm glad I spoke up, though honestly the timing worked out well for us. Sometimes things just click into place."
+    },
+    {
+      "id": "AMB-en-3",
+      "category": "ambiguous",
+      "primary_value": "multiple",
+      "language": "en",
+      "difficulty": "medium",
+      "expected_confirms": {"min": 1, "max": 2},
+      "label": "Ambiguous — genuine E signal, explicit anti-V framing",
+      "notes": "E is genuinely demonstrated: opportunity identification, solo outreach, partnership narrative, financial case. However, the candidate explicitly frames team exclusion as a strategy ('didn't involve the broader team', 'working around organizational friction'). V should NOT be confirmed. An accurate model confirms E only, rejects V.",
+      "text": "I identified the partnership channel gap myself and ran the entire outreach campaign solo — 22 vendors contacted, four deals closed in eight weeks. I deliberately kept the scope tight and didn't involve the broader team, since cross-functional coordination would have slowed things down significantly. I built the business case and presented it directly to the CEO, who funded two additional partnership hires. I've found that moving fast and being decisive often means working around organizational friction rather than through it."
+    },
+    {
+      "id": "AMB-ru-1",
+      "category": "ambiguous",
+      "primary_value": "R",
+      "language": "ru",
+      "difficulty": "hard",
+      "expected_confirms": {"min": 0, "max": 0},
+      "label": "Двусмысленный — удача, выдаваемая за Ответственные инновации",
+      "notes": "Uses measurement language (conversion dropped, 11% growth, two-week window) that resembles R, but no hypothesis was stated, no control group was used, and the candidate explicitly concludes that intuitive decisions are their strength — directly contradicting R's hypothesis-testing and data-driven core. Should not confirm R.",
+      "text": "Я заметил, что конверсия упала, и предложил изменить посадочную страницу — просто почувствовал, что что-то не так. Мы внесли правки и спустя две недели увидели рост на 11%. Руководство было довольно. Этот случай убедил меня в том, что мои интуитивные решения часто оказываются правильными. Иногда просто нужно доверять чутью, а не тратить время на длительный анализ."
+    }
+
+  ]
+}

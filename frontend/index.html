@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>D.R.I.V.E. Evaluator</title>
+  <meta name="description" content="Evaluate candidate text against the D.R.I.V.E. company values with AI-powered analysis and real-time evidence highlighting." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-base: #0a0b0f;
+      --bg-surface: #111318;
+      --bg-card: #16181f;
+      --bg-input: #0e1016;
+      --bg-hover: #1c1f2a;
+      --border: rgba(255,255,255,0.07);
+      --border-focus: rgba(255,255,255,0.18);
+      --text-primary: #e8eaf0;
+      --text-secondary: #8890a4;
+      --text-muted: #4a5068;
+      --glass: rgba(22, 24, 31, 0.7);
+
+      /* D.R.I.V.E. value colors */
+      --d-color: #f97316;
+      --d-bg: rgba(249, 115, 22, 0.12);
+      --d-border: rgba(249, 115, 22, 0.35);
+      --r-color: #3b82f6;
+      --r-bg: rgba(59, 130, 246, 0.12);
+      --r-border: rgba(59, 130, 246, 0.35);
+      --i-color: #a855f7;
+      --i-bg: rgba(168, 85, 247, 0.12);
+      --i-border: rgba(168, 85, 247, 0.35);
+      --v-color: #22c55e;
+      --v-bg: rgba(34, 197, 94, 0.12);
+      --v-border: rgba(34, 197, 94, 0.35);
+      --e-color: #facc15;
+      --e-bg: rgba(250, 204, 21, 0.12);
+      --e-border: rgba(250, 204, 21, 0.35);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── Background Grid ─────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Radial glow top-left */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: -200px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Layout ──────────────────────────────────────────── */
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 6rem;
+    }
+
+    /* ── Header ──────────────────────────────────────────── */
+    header {
+      text-align: center;
+      padding: 3rem 0 2.5rem;
+      position: relative;
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.35rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .logo-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 6px #22c55e;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #e8eaf0 0%, #8890a4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.75rem;
+    }
+
+    .brand {
+      display: inline-flex;
+      gap: 0.1rem;
+    }
+
+    .brand span {
+      display: inline-block;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+      -webkit-text-fill-color: unset;
+    }
+    .brand .d { color: var(--d-color); }
+    .brand .r { color: var(--r-color); }
+    .brand .i { color: var(--i-color); }
+    .brand .v { color: var(--v-color); }
+    .brand .e { color: var(--e-color); }
+
+    .subtitle {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── Input Card ──────────────────────────────────────── */
+    .card {
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .card:focus-within {
+      border-color: var(--border-focus);
+    }
+
+    .card-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-label .dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--r-color);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      line-height: 1.7;
+    }
+
+    textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    textarea:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .char-count {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .btn-analyze {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0.7rem 1.6rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-analyze::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0);
+      transition: background 0.2s;
+    }
+
+    .btn-analyze:hover::before { background: rgba(255,255,255,0.08); }
+    .btn-analyze:active { transform: scale(0.97); }
+    .btn-analyze:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-icon { font-size: 1rem; }
+
+    /* ── Spinner ─────────────────────────────────────────── */
+    #loading {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding: 3rem;
+      text-align: center;
+    }
+
+    #loading.visible { display: flex; }
+
+    .spinner-ring {
+      width: 48px; height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* ── Results ─────────────────────────────────────────── */
+    #results { display: none; }
+    #results.visible { display: block; }
+
+    /* Summary badges */
+    .summary-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-radius: 100px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: 1px solid;
+      transition: transform 0.15s;
+      cursor: default;
+    }
+
+    .badge:hover { transform: translateY(-1px); }
+
+    .badge-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .badge-count {
+      background: rgba(255,255,255,0.15);
+      border-radius: 100px;
+      padding: 0.05rem 0.45rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    /* Transcript */
+    .transcript-card {
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .transcript-text {
+      font-size: 0.97rem;
+      line-height: 1.85;
+      color: var(--text-primary);
+    }
+
+    /* Highlighted sentence (inline span) */
+    .hl-sentence {
+      position: relative;
+      border-radius: 4px;
+      padding: 1px 3px;
+      cursor: pointer;
+      transition: filter 0.15s;
+      display: inline;
+    }
+
+    .hl-sentence:hover { filter: brightness(1.2); }
+
+    /* Tooltip */
+    .tooltip {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 320px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-focus);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+      z-index: 100;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      pointer-events: none;
+      text-align: left;
+    }
+
+    .hl-sentence:hover .tooltip { display: block; }
+
+    .tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--border-focus);
+    }
+
+    .tooltip-value {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .tooltip-reasoning {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.6rem;
+      line-height: 1.5;
+    }
+
+    .tooltip-evidence-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 0.3rem;
+    }
+
+    .tooltip-evidence {
+      font-size: 0.82rem;
+      color: var(--text-primary);
+      font-style: italic;
+      background: var(--bg-hover);
+      border-radius: 6px;
+      padding: 0.4rem 0.6rem;
+      border-left: 2px solid;
+      line-height: 1.5;
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .legend-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+
+    /* Error */
+    .error-banner {
+      display: none;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      color: #fca5a5;
+      font-size: 0.88rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .error-banner.visible { display: block; }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width: 580px) {
+      .tooltip { width: 260px; }
+      h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-badge">
+      <span class="logo-dot"></span>
+      AI-Powered Hiring Evaluation
+    </div>
+    <h1>
+      <span class="brand">
+        <span class="d">D</span><span class="text">.</span><span class="r">R</span><span class="text">.</span><span class="i">I</span><span class="text">.</span><span class="v">V</span><span class="text">.</span><span class="e">E</span><span class="text">.</span>
+      </span>
+      Evaluator
+    </h1>
+    <p class="subtitle">Paste a candidate response below. Our AI detects concrete evidence of each company value and highlights it with reasoning.</p>
+  </header>
+
+  <!-- Input Card -->
+  <div class="card">
+    <div class="card-label"><span class="dot"></span>Candidate Text</div>
+    <textarea
+      id="input-text"
+      placeholder="Paste the candidate's written answer, cover letter excerpt, or interview response here (English, Russian, or Kazakh)…"
+      aria-label="Candidate text input"
+    ></textarea>
+    <div class="actions">
+      <span class="char-count" id="char-count">0 characters</span>
+      <button class="btn-analyze" id="analyze-btn" onclick="runEval()">
+        <span class="btn-icon">✦</span>
+        Analyze Text
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Banner -->
+  <div class="error-banner" id="error-banner" role="alert"></div>
+
+  <!-- Loading -->
+  <div id="loading" role="status" aria-live="polite">
+    <div class="spinner-ring"></div>
+    <span class="loading-label">Evaluating against D.R.I.V.E. values…</span>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+
+    <!-- Summary -->
+    <div class="summary-section">
+      <div class="section-title">Detected Values</div>
+      <div class="badges" id="summary-badges"></div>
+    </div>
+
+    <!-- Highlighted Transcript -->
+    <div class="transcript-card">
+      <div class="section-title" style="margin-bottom:1rem">Annotated Response</div>
+      <div class="transcript-text" id="transcript"></div>
+      <div class="legend" id="legend"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  /* ── Constants ──────────────────────────────────────────── */
+  const API_BASE = '';  // same origin
+
+  const VALUE_META = {
+    D: { name: 'Disciplined Resilience',      color: '#f97316', bg: 'rgba(249,115,22,0.15)',  border: 'rgba(249,115,22,0.5)' },
+    R: { name: 'Responsible Innovation',      color: '#3b82f6', bg: 'rgba(59,130,246,0.15)',  border: 'rgba(59,130,246,0.5)' },
+    I: { name: 'Insightful Vision',           color: '#a855f7', bg: 'rgba(168,85,247,0.15)',  border: 'rgba(168,85,247,0.5)' },
+    V: { name: 'Values-Driven Leadership',    color: '#22c55e', bg: 'rgba(34,197,94,0.15)',   border: 'rgba(34,197,94,0.5)'  },
+    E: { name: 'Entrepreneurial Execution',   color: '#facc15', bg: 'rgba(250,204,21,0.15)',  border: 'rgba(250,204,21,0.5)' },
+  };
+
+  /* ── Char counter ───────────────────────────────────────── */
+  const textarea = document.getElementById('input-text');
+  const charCount = document.getElementById('char-count');
+  textarea.addEventListener('input', () => {
+    const n = textarea.value.length;
+    charCount.textContent = n.toLocaleString() + ' character' + (n !== 1 ? 's' : '');
+  });
+
+  /* ── UI helpers ─────────────────────────────────────────── */
+  function showLoading(on) {
+    document.getElementById('loading').classList.toggle('visible', on);
+    document.getElementById('analyze-btn').disabled = on;
+  }
+
+  function showResults(on) {
+    document.getElementById('results').classList.toggle('visible', on);
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error-banner');
+    if (msg) {
+      el.textContent = '⚠ ' + msg;
+      el.classList.add('visible');
+    } else {
+      el.classList.remove('visible');
+    }
+  }
+
+  /* ── Main evaluator ─────────────────────────────────────── */
+  async function runEval() {
+    const text = textarea.value.trim();
+    if (!text) return;
+
+    showError('');
+    showResults(false);
+    showLoading(true);
+
+    try {
+      const resp = await fetch(`${API_BASE}/evaluate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.detail || `Server error ${resp.status}`);
+      }
+
+      const data = await resp.json();
+      renderResults(text, data);
+    } catch (e) {
+      showError(e.message || 'An unexpected error occurred. Is the server running?');
+    } finally {
+      showLoading(false);
+    }
+  }
+
+  /* ── Render results ─────────────────────────────────────── */
+  function renderResults(originalText, data) {
+    const { results, summary } = data;
+
+    // ── Summary badges ─────────────────
+    const badgeContainer = document.getElementById('summary-badges');
+    badgeContainer.innerHTML = '';
+
+    if (!results || results.length === 0) {
+      badgeContainer.innerHTML = '<span style="color:var(--text-muted);font-size:0.85rem">No D.R.I.V.E. values detected in this text.</span>';
+    } else {
+      // Group by value_code
+      const grouped = {};
+      for (const r of results) {
+        if (!grouped[r.value_code]) grouped[r.value_code] = [];
+        grouped[r.value_code].push(r);
+      }
+
+      for (const [code, items] of Object.entries(grouped)) {
+        const meta = VALUE_META[code] || { name: code, color: '#888', bg: 'rgba(128,128,128,0.12)', border: 'rgba(128,128,128,0.3)' };
+        const badge = document.createElement('div');
+        badge.className = 'badge';
+        badge.style.cssText = `color:${meta.color};background:${meta.bg};border-color:${meta.border}`;
+        badge.innerHTML = `<span class="badge-code">${code}</span>${meta.name}<span class="badge-count">${items.length}</span>`;
+        badgeContainer.appendChild(badge);
+      }
+    }
+
+    // ── Transcript ──────────────────────
+    const transcriptEl = document.getElementById('transcript');
+    transcriptEl.innerHTML = '';
+
+    if (!results || results.length === 0) {
+      transcriptEl.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><p>No confirmed values were found. Try a more detailed answer that describes specific actions and outcomes.</p></div>`;
+    } else {
+      // Build a map: sentence text → list of result objects
+      const sentenceMap = new Map();
+      for (const r of results) {
+        if (!sentenceMap.has(r.text)) sentenceMap.set(r.text, []);
+        sentenceMap.get(r.text).push(r);
+      }
+
+      // Split original text into rough sentences using the confirmed ones as anchors
+      const rendered = renderTranscript(originalText, sentenceMap);
+      transcriptEl.appendChild(rendered);
+    }
+
+    // ── Legend ────────────────────────
+    const legendEl = document.getElementById('legend');
+    legendEl.innerHTML = '';
+    const seenCodes = new Set((results || []).map(r => r.value_code));
+    for (const code of seenCodes) {
+      const meta = VALUE_META[code] || { name: code, color: '#888' };
+      const item = document.createElement('div');
+      item.className = 'legend-item';
+      item.innerHTML = `<span class="legend-dot" style="background:${meta.color}"></span><strong style="color:${meta.color}">${code}</strong> — ${meta.name}`;
+      legendEl.appendChild(item);
+    }
+
+    showResults(true);
+  }
+
+  /* ── Transcript builder ─────────────────────────────────── */
+  function renderTranscript(originalText, sentenceMap) {
+    const frag = document.createDocumentFragment();
+
+    // We'll walk through the original text and highlight matched sentences
+    let remaining = originalText;
+    let offset = 0;
+
+    // Sort confirmed sentences by their position inside original text
+    const matches = [];
+    for (const [sentText, results] of sentenceMap) {
+      let searchFrom = 0;
+      let idx;
+      while ((idx = originalText.indexOf(sentText, searchFrom)) !== -1) {
+        matches.push({ start: idx, end: idx + sentText.length, sentText, results });
+        searchFrom = idx + 1;
+        break; // only first occurrence per sentence
+      }
+    }
+    matches.sort((a, b) => a.start - b.start);
+
+    let cursor = 0;
+    for (const m of matches) {
+      // Plain text before this match
+      if (m.start > cursor) {
+        frag.appendChild(document.createTextNode(originalText.slice(cursor, m.start)));
+      }
+
+      // Highlighted sentence (pick first result for color, show all in tooltip)
+      const primary = m.results[0];
+      const meta = VALUE_META[primary.value_code] || { name: primary.value_code, color: '#888', bg: 'rgba(128,128,128,0.12)', border: 'rgba(128,128,128,0.3)' };
+
+      const span = document.createElement('span');
+      span.className = 'hl-sentence';
+      span.style.cssText = `background:${meta.bg};border-bottom:2px solid ${meta.border};`;
+      span.setAttribute('tabindex', '0');
+      span.setAttribute('aria-label', `${meta.name}: ${primary.reasoning}`);
+
+      // Sentence text — highlight evidence_quote within it
+      const evidenceQuote = primary.highlights?.find(h => h.pos_category === 'EVIDENCE_QUOTE')?.token || null;
+      if (evidenceQuote && m.sentText.includes(evidenceQuote)) {
+        const parts = m.sentText.split(evidenceQuote);
+        parts.forEach((part, i) => {
+          if (part) span.appendChild(document.createTextNode(part));
+          if (i < parts.length - 1) {
+            const em = document.createElement('mark');
+            em.style.cssText = `background:${meta.bg};color:${meta.color};font-weight:600;border-radius:2px;padding:0 1px;`;
+            em.textContent = evidenceQuote;
+            span.appendChild(em);
+          }
+        });
+      } else {
+        span.textContent = m.sentText;
+      }
+
+      // Tooltip
+      const tooltip = document.createElement('div');
+      tooltip.className = 'tooltip';
+
+      let tooltipHTML = '';
+      for (const r of m.results) {
+        const rm = VALUE_META[r.value_code] || meta;
+        const eq = r.highlights?.find(h => h.pos_category === 'EVIDENCE_QUOTE')?.token;
+        tooltipHTML += `
+          <div class="tooltip-value" style="color:${rm.color}">${r.value_code} · ${rm.name}</div>
+          <div class="tooltip-reasoning">${escHtml(r.reasoning)}</div>
+          ${eq ? `<div class="tooltip-evidence-label">Key Evidence</div><div class="tooltip-evidence" style="border-color:${rm.color}">"${escHtml(eq)}"</div>` : ''}
+          ${m.results.indexOf(r) < m.results.length - 1 ? '<hr style="border:none;border-top:1px solid rgba(255,255,255,0.07);margin:0.75rem 0">' : ''}
+        `;
+      }
+      tooltip.innerHTML = tooltipHTML;
+      span.appendChild(tooltip);
+      frag.appendChild(span);
+
+      cursor = m.end;
+    }
+
+    // Remaining plain text
+    if (cursor < originalText.length) {
+      frag.appendChild(document.createTextNode(originalText.slice(cursor)));
+    }
+
+    return frag;
+  }
+
+  function escHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  /* ── Keyboard support for highlighted sentences ─────────── */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.target.classList.contains('hl-sentence')) {
+      const tooltip = e.target.querySelector('.tooltip');
+      if (tooltip) tooltip.style.display = tooltip.style.display === 'block' ? '' : 'block';
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Environment secrets — NEVER commit .env
+.env
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+
+# Model cache (sentence-transformers downloads here)
+~/.cache/
+
+# Ruff
+.ruff_cache/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore
+# model storage if mapped locally (unlikely but safe)
+models/
+
+# Gemini-specific
+.gemini/
+.claude/
