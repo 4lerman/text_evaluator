@@ -114,5 +114,6 @@ def highlight_sentence(
         value_code=verdict.value_code,
         value_name=verdict.value_name,
         reasoning=verdict.reasoning,
-        highlights=highlights
+        score=verdict.score,
+        highlights=highlights,
     )
