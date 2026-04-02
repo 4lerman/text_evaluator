@@ -70,11 +70,11 @@ async def run_funnel(text: str, app_state) -> EvaluateResponse:
     # Stage 4: POS Highlighting — route to Russian model for Cyrillic input
     pos_nlp = app_state.ru_pos_nlp if lang in CYRILLIC_LANGS else app_state.pos_nlp
 
-    highlighted_sentences = []
+    highlighted_sentences = list(await asyncio.gather(
+        *[asyncio.to_thread(highlight_sentence, v.text, v, pos_nlp) for v in verdicts]
+    ))
     summary_counts = defaultdict(int)
     for verdict in verdicts:
-        hs = await asyncio.to_thread(highlight_sentence, verdict.text, verdict, pos_nlp)
-        highlighted_sentences.append(hs)
         summary_counts[verdict.value_code] += 1
 
     return EvaluateResponse(
