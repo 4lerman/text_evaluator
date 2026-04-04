@@ -103,7 +103,7 @@ async def run_funnel(text: str, app_state) -> EvaluateResponse:
         return EvaluateResponse(results=[], summary={}, lang=lang)
 
     # Stage 3: LLM Evaluation
-    verdicts = await evaluate_with_llm(scored_chunks, config)
+    verdicts = await evaluate_with_llm(scored_chunks, config, len(sentences))
     if not verdicts:
         return EvaluateResponse(results=[], summary={}, lang=lang)
 

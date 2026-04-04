@@ -22,6 +22,13 @@ class Settings(BaseSettings):
     PROMETHEUS_TIMEOUT_SECONDS: int = 120    # per-chunk Ollama call
     HIGHLIGHT_TIMEOUT_SECONDS: int = 30      # Stage 4
     PROMETHEUS_GLOBAL_CONCURRENCY: int = 1   # Ollama is serial; keep at 1
+    PROMETHEUS_MAX_CHUNKS: int = 5           # hard cap on chunks forwarded to Prometheus
+
+    # Input limits
+    MAX_TEXT_LENGTH: int = 20000             # ~4 000 words; prevents runaway Prometheus queues
+
+    # CORS — restrict in production by setting to a comma-separated list of origins
+    ALLOWED_ORIGINS: list[str] = ["*"]
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

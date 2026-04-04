@@ -12,47 +12,47 @@ ASSERTIVE_NOUNS: set[str] = {
     "execution", "accountability", "service", "collaboration",
     "determination",
     # ── Russian (lemma / base forms) ─────────────────────────────────────────
-    "стратегия",      # strategy
-    "лидерство",      # leadership
-    "инициатива",     # initiative
-    "влияние",        # impact
-    "цель",          # goal
-    "видение",        # vision
-    "рост",          # growth
-    "инновация",      # innovation
-    "стойкость",      # resilience
-    "партнёрство",    # partnership
-    "решение",        # decision
-    "возможность",    # opportunity
-    "честность",      # integrity
-    "дисциплина",     # discipline
-    "проницательность",  # insight
-    "исполнение",     # execution
-    "ответственность",   # accountability
-    "служение",       # service
-    "сотрудничество", # collaboration
-    "решимость",      # determination
+    "стратегия",          # strategy
+    "лидерство",          # leadership
+    "инициатива",         # initiative
+    "влияние",            # impact
+    "цель",               # goal
+    "видение",            # vision
+    "рост",               # growth
+    "инновация",          # innovation
+    "стойкость",          # resilience
+    "партнёрство",        # partnership
+    "решение",            # decision
+    "возможность",        # opportunity
+    "честность",          # integrity
+    "дисциплина",         # discipline
+    "проницательность",   # insight
+    "исполнение",         # execution
+    "ответственность",    # accountability
+    "служение",           # service
+    "сотрудничество",     # collaboration
+    "решимость",          # determination
     # ── Kazakh (base forms) ───────────────────────────────────────────────────
-    "стратегия",      # strategy (same in KZ)
-    "көшбасшылық",   # leadership
-    "бастама",        # initiative
-    "ықпал",         # impact
-    "мақсат",        # goal
-    "көзқарас",      # vision
-    "өсу",           # growth
-    "инновация",      # innovation (same in KZ)
-    "төзімділік",    # resilience
-    "серіктестік",   # partnership
-    "шешім",         # decision
-    "мүмкіндік",     # opportunity
-    "адалдық",       # integrity
-    "тәртіп",        # discipline
-    "түсінік",       # insight
-    "орындау",       # execution
-    "жауапкершілік", # accountability
-    "қызмет",        # service
-    "ынтымақтастық", # collaboration
-    "табандылық",    # determination
+    "көшбасшылық",        # leadership
+    "бастама",            # initiative
+    "ықпал",              # impact
+    "мақсат",             # goal
+    "көзқарас",           # vision
+    "өсу",                # growth
+    "төзімділік",         # resilience
+    "серіктестік",        # partnership
+    "шешім",              # decision
+    "мүмкіндік",          # opportunity
+    "адалдық",            # integrity
+    "тәртіп",             # discipline
+    "түсінік",            # insight
+    "орындау",            # execution
+    "жауапкершілік",      # accountability
+    "қызмет",             # service
+    "ынтымақтастық",      # collaboration
+    "табандылық",         # determination
+    # Note: "стратегия" and "инновация" appear in both Russian and Kazakh but
+    # are already covered by the Russian section above (sets deduplicate).
 }
 
 def highlight_sentence(

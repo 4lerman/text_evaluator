@@ -8,6 +8,8 @@ class ScoredChunk(BaseModel):
     value_code: str
     value_name: str
     similarity_score: float
+    context: str = ""  # surrounding sentences (window); empty = use text alone
+    sentence_index: int = 0  # position in original sentence list (for diversity selection)
 
 class LLMVerdict(BaseModel):
     """The LLM's evaluation of a matched sentence."""

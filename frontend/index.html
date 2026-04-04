@@ -486,6 +486,64 @@
 
     .error-banner.visible { display: block; }
 
+    /* ── Metrics Grid ───────────────────────────────────── */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .metric-card {
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .metric-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .metric-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .metric-sub {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .metric-trend {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.4rem;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .positive { color: #22c55e; }
+    .neutral { color: var(--text-secondary); }
+    .accent { color: #3b82f6; }
+
     /* ── Responsive ──────────────────────────────────────── */
     @media (max-width: 580px) {
       .tooltip { width: 260px; }
@@ -546,6 +604,9 @@
       <div class="section-title">Detected Values</div>
       <div class="badges" id="summary-badges"></div>
     </div>
+
+    <!-- Metrics Breakdown -->
+    <div class="metrics-grid" id="metrics-grid"></div>
 
     <!-- Highlighted Transcript -->
     <div class="transcript-card">
@@ -630,7 +691,10 @@
 
   /* ── Render results ─────────────────────────────────────── */
   function renderResults(originalText, data) {
-    const { results, summary } = data;
+    const { results, summary, metrics } = data;
+
+    // ── Metrics ────────────────────────
+    renderMetrics(metrics);
 
     // ── Summary badges ─────────────────
     const badgeContainer = document.getElementById('summary-badges');
@@ -688,6 +752,50 @@
     }
 
     showResults(true);
+  }
+
+  function renderMetrics(metrics) {
+    const container = document.getElementById('metrics-grid');
+    container.innerHTML = '';
+    if (!metrics) return;
+
+    const cards = [
+      {
+        label: 'Overall Score',
+        value: metrics.overall_score.toFixed(1),
+        sub: 'Out of 5.0 points',
+        trend: metrics.overall_score >= 4 ? 'Excellent' : (metrics.overall_score >= 3 ? 'Strong' : 'Needs Work'),
+        trendClass: metrics.overall_score >= 3 ? 'positive' : 'neutral'
+      },
+      {
+        label: 'Value Coverage',
+        value: `${metrics.coverage}/5`,
+        sub: metrics.coverage === 5 ? 'All values detected' : 'Partial coverage',
+        trend: 'Diversity',
+        trendClass: 'accent'
+      },
+      {
+        label: 'Balance Score',
+        value: (metrics.balance_score * 100).toFixed(0) + '%',
+        sub: metrics.balance_score >= 0.85 ? 'Well-rounded' : 'Concentrated',
+        trend: 'Consistency',
+        trendClass: metrics.balance_score >= 0.85 ? 'positive' : 'neutral'
+      }
+    ];
+
+    cards.forEach(c => {
+      const card = document.createElement('div');
+      card.className = 'metric-card';
+      card.innerHTML = `
+        <div class="metric-top">
+          <span class="metric-label">${c.label}</span>
+          <span class="metric-trend ${c.trendClass}">${c.trend}</span>
+        </div>
+        <div class="metric-value">${c.value}</div>
+        <div class="metric-sub">${c.sub}</div>
+      `;
+      container.appendChild(card);
+    });
   }
 
   /* ── Transcript builder ─────────────────────────────────── */

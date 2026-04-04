@@ -41,10 +41,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="D.R.I.V.E. Evaluator", lifespan=lifespan)
 
-# CORS — allow all origins during development
+# CORS — configure ALLOWED_ORIGINS in .env for production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=config.ALLOWED_ORIGINS,
     allow_methods=["POST", "GET", "OPTIONS"],
     allow_headers=["*"],
 )
